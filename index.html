@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="style.css" />
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <title>MyPriceAlert</title>
   </head>
   <body>
@@ -15,7 +16,9 @@
         <h1 class="logo">MyPriceAlert</h1>
         <button class="account-btn"><i class="fas fa-user"></i></button>
       </div>
-      <section id="coins-list">
+      <div id="search-list"></div>
+      <section
+       id="coins-list">
         <table>
           <tr id="coins-list-headers">
             <th class="coins-list-header">Logo</th>
@@ -30,10 +33,13 @@
           <button class="toolbar-btn"><i class="fas fa-bell"></i></button>
           <button class="toolbar-btn hidden"><i class="fas fa-bell-slash"></i></button>
           <button class="toolbar-btn hidden"><i class="fas fa-trash"></i></button>
-          <button class="toolbar-btn">+</button>
+          <form id="coin-add-form">
+            <input class="search-input" type="text" placeholder="Search Coin">
+            <button id="add-coin-btn" class="toolbar-btn" type="button">+</button>
+          </form>
       </div>
     </main>
-    <script src="/index.js"></script>
     <script src="https://kit.fontawesome.com/f3a33b401b.js" crossorigin="anonymous"></script>
+    <script src="/index.js"></script>
   </body>
 </html>
