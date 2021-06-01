@@ -4,6 +4,7 @@ const coinsListContent = document.querySelector("#coins-list table tbody");
 const searchInput = document.querySelector(".search-input");
 const searchList = document.querySelector("#search-list");
 const addCoinBtn = document.querySelector("#add-coin-btn");
+let coinsRows = document.querySelectorAll(".coin-row");
 
 //Search
 const searchStates = async (searchText) => {
@@ -19,11 +20,8 @@ const searchStates = async (searchText) => {
     return coinData.name.match(regex) || coinData.symbol.match(regex);
   });
 
-  console.log(searches);
-
   searchesResult(searches);
   const searchElements = document.querySelectorAll(".search-element");
-  console.log(searchElements);
   searchSelect(searchElements, searches);
 };
 //Search Result
@@ -53,11 +51,7 @@ const searchesResult = (searches) => {
 
 const searchSelect = (searchElements, searches) => {
   searchElements.forEach((searchElement) => {
-    console.log("PETLA");
-    console.log(searchElement);
     searchElement.addEventListener("click", () => {
-      console.log(searchElement);
-      console.log("PRZYPISANIE");
       searchInput.value = searchElement.id;
       clearSearches(searches);
     });
@@ -84,7 +78,6 @@ const addCoinStates = async (coinId) => {
     return coinData.id.match(coinId);
   });
 
-  console.log("UDALO SIE POBRAC DANE");
   createCoinListElement(coinData);
   searchInput.value = "";
 };
@@ -101,6 +94,7 @@ const createCoinListElement = (coins) => {
     nameTd.classList.add("coin-td");
     const priceTd = document.createElement("td");
     priceTd.innerText = `${coin.current_price}USD`;
+    priceTd.classList.add("price-td");
     priceTd.classList.add("coin-td");
     const changeTd = document.createElement("td");
     changeTd.classList.add("coin-td");
@@ -115,6 +109,7 @@ const createCoinListElement = (coins) => {
     coinRow.append(changeTd);
 
     coinsListContent.append(coinRow);
+    coinsRows = document.querySelectorAll(".coin-row");
   });
 };
 
@@ -122,3 +117,68 @@ const createCoinListElement = (coins) => {
 searchInput.addEventListener("input", () => searchStates(searchInput.value));
 //Adding coins to list
 addCoinBtn.addEventListener("click", () => addCoinStates(searchInput.value));
+
+const selectCoinsIds = (coinsRows) => {
+  const coinRowsIds = [];
+  coinsRows.forEach((coin) => {
+    const coinId = coin.id.slice(0, coin.id.length - 3);
+    coinRowsIds.push(coinId);
+  });
+  return coinRowsIds;
+};
+
+const convertCoinsRowsIds = (coinRowsIds) => {
+  const coinRowsIdsString = coinRowsIds.join("%2C%20");
+  return coinRowsIdsString;
+};
+
+const getCoinsPrices = (coinsData) => {
+  const coinsPrices = [];
+  coinsData.forEach((coinData) => {
+    coinsPrices.push(coinData.current_price);
+  });
+  return coinsPrices;
+};
+
+const getCoinChanges = (coinsData) => {
+  const coinsChanges = [];
+  coinsData.forEach((coinData) => {
+    coinsChanges.push(
+      Math.round((coinData.price_change_percentage_24h * 100) / 100)
+    );
+  });
+  return coinsChanges;
+};
+
+const getCoinsData = async (coinRowsIdsString, coinRowsIds) => {
+  await axios
+    .get(
+      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinRowsIdsString}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`
+    )
+    .then((res) => {
+      const coinsData = res.data;
+      const coinsPrices = getCoinsPrices(coinsData);
+      const coinsChanges = getCoinChanges(coinsData);
+      const coinsTdPrice = document.querySelectorAll(".price-td");
+      coinsTdPrice.forEach((coinTdPrice) => {
+        coinTdPrice.innerText = `${coinsPrices}USD`;
+      });
+      const coinsTdChange = document.querySelectorAll(".change-td");
+      coinsTdChange.forEach((coinTdChange) => {
+        coinTdChange.innerText = `${coinsChanges}%`;
+      });
+      console.log(coinsPrices);
+      console.log(coinsChanges);
+      console.log(coinRowsIds);
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+};
+
+const getCoinsStates = () => {
+  const coinsRowsIds = selectCoinsIds(coinsRows);
+  const coinRowsIdsString = convertCoinsRowsIds(coinsRowsIds);
+  console.log(coinRowsIdsString);
+  getCoinsData(coinRowsIdsString, coinsRowsIds);
+};
