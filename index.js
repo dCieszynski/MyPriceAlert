@@ -160,13 +160,16 @@ const getCoinsData = async (coinRowsIdsString, coinRowsIds) => {
       const coinsPrices = getCoinsPrices(coinsData);
       const coinsChanges = getCoinChanges(coinsData);
       const coinsTdPrice = document.querySelectorAll(".price-td");
+      const coinTdPriceArray = Array.from(coinsTdPrice);
       coinsTdPrice.forEach((coinTdPrice) => {
-        coinTdPrice.innerText = `${coinsPrices}USD`;
+        const coinIndex = coinTdPriceArray.indexOf(coinTdPrice);
+        coinTdPrice.innerText = `${coinsPrices[coinIndex]}USD`;
       });
-      const coinsTdChange = document.querySelectorAll(".change-td");
+      /*const coinsTdChange = document.querySelectorAll(".change-td");
       coinsTdChange.forEach((coinTdChange) => {
-        coinTdChange.innerText = `${coinsChanges}%`;
-      });
+        const coinIndex = coinsTdChange.indexOf(coinTdChange);
+        coinTdChange.innerText = `${coinsChanges[coinIndex]}%`;
+      });*/
       console.log(coinsPrices);
       console.log(coinsChanges);
       console.log(coinRowsIds);
