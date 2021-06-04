@@ -178,63 +178,57 @@ const getCoinsChanges = (coinsData) => {
 };
 
 const getCoinsData = async (coinRowsIdsString, coinRowsIds) => {
-  await axios
-    .get(
-      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinRowsIdsString}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`
-    )
-    .then((res) => {
-      const coinsData = res.data;
-      const coinsIds = getCoinsIds(coinsData);
-      const coinsLogos = getCoinsLogos(coinsData);
-      const coinsNames = getCoinsNames(coinsData);
-      const coinsPrices = getCoinsPrices(coinsData);
-      const coinsChanges = getCoinsChanges(coinsData);
+  if (coinRowsIdsString != "")
+    await axios
+      .get(
+        `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinRowsIdsString}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`
+      )
+      .then((res) => {
+        const coinsData = res.data;
+        const coinsIds = getCoinsIds(coinsData);
+        const coinsLogos = getCoinsLogos(coinsData);
+        const coinsNames = getCoinsNames(coinsData);
+        const coinsPrices = getCoinsPrices(coinsData);
+        const coinsChanges = getCoinsChanges(coinsData);
 
-      const coinsTrIds = document.querySelectorAll(".coin-row");
-      const coinTrIdsArray = Array.from(coinsTrIds);
-      coinsTrIds.forEach((coinTrId) => {
-        const idIndex = coinTrIdsArray.indexOf(coinTrId);
-        coinTrId.id = `${coinsIds[idIndex]}-el`;
+        const coinsTrIds = document.querySelectorAll(".coin-row");
+        const coinTrIdsArray = Array.from(coinsTrIds);
+        coinsTrIds.forEach((coinTrId) => {
+          const idIndex = coinTrIdsArray.indexOf(coinTrId);
+          coinTrId.id = `${coinsIds[idIndex]}-el`;
+        });
+
+        const coinsTdLogo = document.querySelectorAll(".logo-td");
+        const coinTdLogoArray = Array.from(coinsTdLogo);
+        coinsTdLogo.forEach((coinTdLogo) => {
+          const logoIndex = coinTdLogoArray.indexOf(coinTdLogo);
+          coinTdLogo.src = coinsLogos[logoIndex];
+        });
+
+        const coinsTdName = document.querySelectorAll(".name-td");
+        const coinTdNameArray = Array.from(coinsTdName);
+        coinsTdName.forEach((coinTdName) => {
+          const nameIndex = coinTdNameArray.indexOf(coinTdName);
+          coinTdName.innerText = `${coinsNames[nameIndex]}`;
+        });
+
+        const coinsTdPrice = document.querySelectorAll(".price-td");
+        const coinTdPriceArray = Array.from(coinsTdPrice);
+        coinsTdPrice.forEach((coinTdPrice) => {
+          const priceIndex = coinTdPriceArray.indexOf(coinTdPrice);
+          coinTdPrice.innerText = `${coinsPrices[priceIndex]}USD`;
+        });
+
+        const coinsTdChange = document.querySelectorAll(".change-td");
+        const coinsTdChangeArray = Array.from(coinsTdChange);
+        coinsTdChange.forEach((coinTdChange) => {
+          const changeIndex = coinsTdChangeArray.indexOf(coinTdChange);
+          coinTdChange.innerText = `${coinsChanges[changeIndex]}%`;
+        });
+      })
+      .catch((error) => {
+        console.error(error);
       });
-
-      const coinsTdLogo = document.querySelectorAll(".logo-td");
-      const coinTdLogoArray = Array.from(coinsTdLogo);
-      coinsTdLogo.forEach((coinTdLogo) => {
-        const logoIndex = coinTdLogoArray.indexOf(coinTdLogo);
-        coinTdLogo.src = coinsLogos[logoIndex];
-      });
-
-      const coinsTdName = document.querySelectorAll(".name-td");
-      const coinTdNameArray = Array.from(coinsTdName);
-      coinsTdName.forEach((coinTdName) => {
-        const nameIndex = coinTdNameArray.indexOf(coinTdName);
-        coinTdName.innerText = `${coinsNames[nameIndex]}`;
-      });
-
-      const coinsTdPrice = document.querySelectorAll(".price-td");
-      const coinTdPriceArray = Array.from(coinsTdPrice);
-      coinsTdPrice.forEach((coinTdPrice) => {
-        const priceIndex = coinTdPriceArray.indexOf(coinTdPrice);
-        coinTdPrice.innerText = `${coinsPrices[priceIndex]}USD`;
-      });
-
-      const coinsTdChange = document.querySelectorAll(".change-td");
-      const coinsTdChangeArray = Array.from(coinsTdChange);
-      coinsTdChange.forEach((coinTdChange) => {
-        const changeIndex = coinsTdChangeArray.indexOf(coinTdChange);
-        coinTdChange.innerText = `${coinsChanges[changeIndex]}%`;
-      });
-
-      console.log(coinsData);
-      console.log(coinsLogos);
-      console.log(coinsNames);
-      console.log(coinsPrices);
-      console.log(coinsChanges);
-      console.log(coinRowsIds);
-    })
-    .catch((error) => {
-      console.error(error);
-    });
 };
 
 const getCoinsStates = () => {
@@ -243,3 +237,11 @@ const getCoinsStates = () => {
   console.log(coinRowsIdsString);
   getCoinsData(coinRowsIdsString, coinsRowsIds);
 };
+
+const refreshCoinList = () => {
+  const refreshTime = 60000 * 20;
+  getCoinsStates();
+  setTimeout(refreshCoinList, refreshTime);
+};
+
+refreshCoinList();
