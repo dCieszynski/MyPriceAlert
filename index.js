@@ -74,19 +74,17 @@ const clearSearches = (searches) => {
 };
 //Adding coins
 const addCoinStates = async (coinId) => {
-  const res = await axios.get(
-    `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinId}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`
-  );
+  if (searchInput.value != "") {
+    const res = await axios.get(
+      `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${coinId}&order=market_cap_desc&per_page=100&page=1&sparkline=false&price_change_percentage=24h`
+    );
 
-  const coinData = res.data;
+    const coinData = res.data;
 
-  let coins = coinData.filter((coinData) => {
-    return coinData.id.match(coinId);
-  });
-
-  console.log("UDALO SIE POBRAC DANE");
-  createCoinListElement(coinData);
-  searchInput.value = "";
+    console.log("UDALO SIE POBRAC DANE");
+    createCoinListElement(coinData);
+    searchInput.value = "";
+  }
 };
 
 const createCoinListElement = (coins) => {
